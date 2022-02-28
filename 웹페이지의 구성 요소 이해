@@ -59,11 +59,72 @@ Disallow는 금지할 페이지를 지정하는데, /는 전체 웹 페이지를
 Selenium Webdriver : 외부 모듈 (파이썬과 같은 3rd party)에서 웹 브라우져를 제어 할 수 있음
 Selenium Grid : 이종 시스템에서 다양한 웹 브라우져를 동시 (parallel)에 테스팅하는 기능을 제공
 
+웹 앱을 테스트 하는 용도로 개발된 Selenium을 응용해서 스크래핑에 사용
+웹드라이버 (Webdriver)를 사용해서 파이썬으로 웹 브라우져를 제어
+
+셀레늄의 Webdriver를 설치 https://chromedriver.chromium.org/downloads
+셀레늄 설치  pip install selenium
+
+from selenium import webdriver
+driver = webdriver.Chrome("chromedriver.exe")
+driver.get("https://www.naver.com")
+
+webdriver안에는 Chrome 클래스가 정의돼 있음
+생성자로 앞서 환경 설정에서 다운 받은 크롬 웹 드라이버의 경로를 넣어주면 객체가 생성되면서 비어있는 웹 브라우져가 실행
+
+(주의)
+코드를 재 실행하면 새로운 웹 브라우져가 생성되며 driver 객체가 최근 생성된 브라우져를 가리키기 때문에 과거 브라우저는 더이상 컨트롤 할 수 없게 됨. 
+스크래핑을 끝내고 웹 브라우져를 종료하고 싶다면 quit 메서드를 사용
+driver.quit()
 
 
+<REQUESTS를 사용한 웹스크래핑>
+셀레늄의 "느린 동작 속도"는 치명적인 단점
+requests와 BeautifulSoup 모듈 사용
+
+GET/POST 메서드
 
 
+<오픈 API를 활용한 스크래핑 - DART>
 
+데이터를 요청하는 URL과 요청 방식이 GET 방식
+데이터를 요청할 때 사용자 인증을 위하여 다트에서 부여받은 API 인증키를 넣어줘야함
+요청된 경우 출력 값은 압축 포맷 (Zip) 형태의 파일 
+ -> 합축 해제 -> XML 포맷의 데이터 획득 -> 파이선 딕셔너리로 변환 -> 판다스 데이터프레임으로 변환
+
+import requests
+import io
+import zipfile
+import xmltodict
+import pandas as pd
+
+io 모듈을 사용해서 스크래핑한 데이터를 바이너리 스트림형태로 메모리로 저장
+이를 사용하여 zipfile 모듈을 사용해서 ZipFile 객체를 생성
+xmltodict 모듈을 사용해서 압축이 해제된 xml 데이터를 파이썬의 OrderedDict 타입으로 변환
+딕셔너리에서 키 값을 확인하여 실제 데이터가 있는 부분을 인덱싱
+해당 데이터를 판다스의 데이터프레임 객체로 변환
+
+JSON 포맷과 XML 포맷으로 제공
+import requests
+import pandas as pd
+
+#crtfc_key는 전자공시 OpenDART의 인증키(string) 출처: https://besixdouze.net/18 [Bésixdouze]
+
+def get_comp_info(key, corp_code="00126380"):
+    url = "https://opendart.fss.or.kr/api/company.json"
+    params = {"crtfc_key": key, "corp_code": corp_code}
+    resp = requests.get(url, params=params)
+    data = resp.json()
+    return data
+
+
+if __name__ == "__main__":
+    key = "Open API Key를 입력하세요"
+    sec = get_comp_info(key)
+    print(sec, type(sec))
+    
+    
+    
 
 
 
